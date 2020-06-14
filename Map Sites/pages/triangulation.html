@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="mapid"></div>
+    <script>
+        const d3 = require('d3-fetch')
+
+
+
+        var map = L.map("mapid").setView([41.935311, 9.153702], 18);
+
+        L.tileLayer(
+            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            // attribution: '&copy; '+mapLink+', '+wholink,
+            maxZoom: 35,
+            })
+        .addTo(map);
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   <link rel="stylesheet" href="../style.css"/>
+   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+   <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+</head>
+<body>
+        <div id="mapid"></div>
+        <script>
+                const fs = require('fs')
+                var lines = fs.readFileSync('data/coords/coordClean.txt').toString().split("\r\n")
+                var polyBan = fs.readFileSync('data/coords/coordBan.txt').toString().split("\r\n")
+                var sites = fs.readFileSync('data/coords/coordSites.txt').toString().split("\r\n")
+
+
+                var mymap = L.map('mapid').setView([41.9403056,9.159416666666665], 15);
+
+                var mapLink = '<a href="http://www.esri.com/">Esri</a>';
+                var wholink = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+
+                L.tileLayer(
+                    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: '&copy; '+mapLink+', '+wholink,
+                    maxZoom: 35,
+                    }).addTo(mymap);
+                            
+                var LeafIcon = L.Icon.extend({
+	                options: {
+		            shadowUrl: '../imgs/leaf-shadow.png',
+		            iconSize:     [38, 95],
+		            shadowSize:   [50, 64],
+		            iconAnchor:   [22, 94],
+		            shadowAnchor: [4, 62],
+        		    popupAnchor:  [-3, -76]
+	                }
+                });
+
+                var greenIcon = new LeafIcon({iconUrl: '../imgs/leaf-green.png'}),
+	            redIcon = new LeafIcon({iconUrl: '../imgs/leaf-red.png'});
+
+
+                var polyArray = []
+                polyBan.forEach(element => {
+                    var latLon = element.split(",")
+                    if(element!=""){
+                        polyArray.push([Number(latLon[0]), Number(latLon[1])])
+                    }
+                })
+                polyArray.pop()
+                var rolliePoly = L.polygon(polyArray)
+                rolliePoly.addTo(mymap);
+
+                var distance
+
+                var intersection = []
+                var distances = []
+                //tab polyline a enlever
+                //faire marcher distance et popup polyline
+                lines.forEach(element => {
+                    var latLng = element.split(",")
+                    var colour;
+                    var r = Math.floor(Math.random() * 255);
+                    var g = Math.floor(Math.random() * 255);
+                    var b = Math.floor(Math.random() * 255);
+                    colour= "rgb("+r+" ,"+g+","+ b+")"; 
+                    if(latLng.length==4){
+                        var rolliePolyLine = L.polyline([[Number(latLng[0]), Number(latLng[1])], [Number(latLng[2]), Number(latLng[3])]], {color : colour});
+                        var inter = turf.lineIntersect(rolliePoly.toGeoJSON(), rolliePolyLine.toGeoJSON())
+                        if(inter!=null)
+                        {
+                            L.geoJSON(inter).addTo(mymap)
+                        }
+                        if(inter.features.length == 0)
+                        {
+                            distances.push(rolliePolyLine)
+                            rolliePolyLine.addTo(mymap)
+                        }
+                    }
+                })
+
+                distances.forEach(element =>{
+                    element.addEventListener("click", () => {
+                        console.log(element.getLatLngs()[0].distanceTo(L.latLng(element.getLatLngs()[1]['lat'], element.getLatLngs()[1]['lng'])))
+                    })
+                })
+
+                var LocInc = []
+                var LocExc = []
+                sites.forEach(element => {
+                    var latLon = element.split(',')
+                    if(element!=""){
+                        var temp = [Number(latLon[0]), Number(latLon[1])]
+                        if(rolliePoly.getBounds().contains(temp)){
+                            LocExc.push(L.marker(temp, {icon : redIcon}).addTo(mymap))
+                        }
+                        else{
+                            LocInc.push(L.marker(temp, {icon : greenIcon}).addTo(mymap))
+                        }
+                        
+                    }
+                });
+
+                var popup = L.popup();
+
+                function onMapClick(e) {
+                    var circle = L.circle(e.latlng, {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5,
+                        radius: 1000
+                    }).addTo(mymap);
+                    
+                    
+                    // popup
+                    //     .setLatLng(e.latlng)
+                    //     .setContent("You clicked the map at " + e.latlng.toString())
+                    //     .openOn(mymap);
+                }
+
+                mymap.on('click', onMapClick);
+
+            </script>
+            
+
+</body>
+</html>

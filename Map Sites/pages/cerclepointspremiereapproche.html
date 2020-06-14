@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   <link rel="stylesheet" href="style.css"/>
+   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+   <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+</head>
+<body>
+        <div id="mapid"></div>
+        <script>
+                const fs = require('fs')
+                var lines = fs.readFileSync('coordClean.txt').toString().split("\r\n")
+                var polyBan = fs.readFileSync('coordBan.txt').toString().split("\r\n")
+                var sites = fs.readFileSync('coordSites.txt').toString().split("\r\n")
+
+
+
+                var mymap = L.map('mapid').setView([41.9403056,9.159416666666665], 15);
+
+                var mapLink = '<a href="http://www.esri.com/">Esri</a>';
+                var wholink = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+
+                L.tileLayer(
+                    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: '&copy; '+mapLink+', '+wholink,
+                    maxZoom: 35,
+                    }).addTo(mymap);
+                
+                L.marker([41.935311, 9.153702]).addTo(mymap)
+
+                lesPoints = [[41.935311, 9.1546029009009],
+                            [41.93576145045045, 9.154482203066472],
+                            [41.93609120306647, 9.15415245045045],
+                            [41.9362119009009, 9.153702],
+                            [41.93609120306647, 9.153251549549548],
+                            [41.93576145045045, 9.152921796933526],
+                            [41.935311, 9.152801099099099],
+                            [41.93486054954955, 9.152921796933526],
+                            [41.93453079693353, 9.153251549549548],
+                            [41.9344100990991, 9.153702],
+                            [41.93453079693353, 9.15415245045045],
+                            [41.93486054954955, 9.154482203066472]]
+                lesPoints.forEach(element => {
+                    L.marker(element).addTo(mymap)
+                });
+
+                function onMapClick(e) {
+                    var circle = L.circle(e.latlng, {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5,
+                        radius: 100
+                    }).addTo(mymap);
+                }
+
+                mymap.on('click', onMapClick);
+
+            </script>
+            
+
+</body>
+</html>

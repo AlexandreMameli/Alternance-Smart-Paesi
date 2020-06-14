@@ -1,0 +1,20 @@
+{
+  "name": "electronmap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^6.0.12"
+  },
+  "dependencies": {
+    "@turf/line-intersect": "^6.0.2",
+    "d3-fetch": "^1.1.2",
+    "rainbowvis.js": "^1.0.1",
+    "turf": "^3.0.14"
+  }
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   <link rel="stylesheet" href="../style.css"/>
+   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+   <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+</head>
+<body>
+        <div id="mapid"></div>
+        <script>
+                var mymap = L.map('mapid').setView([41.996695, 8.827148], 15);
+                const d3 = require('d3-fetch')
+
+
+                function distRSSI(rssi){
+                    return Math.pow(10, (-(rssi + 45)/(10*2.5)))
+                }
+                
+                var LeafIcon = L.Icon.extend({
+	                options: {
+		            iconSize:     [38, 95],
+		            shadowSize:   [50, 64],
+		            iconAnchor:   [22, 94],
+		            shadowAnchor: [4, 62],
+        		    popupAnchor:  [-3, -76]
+	                }
+                });
+                var greenIcon = new LeafIcon({iconUrl: '../imgs/leaf-green.png'}),
+                redIcon = new LeafIcon({iconUrl: '../imgs/leaf-red.png'})
+                
+                d3.csv("D:/Users/Alexm/Documents/SmartPaesi/Map Sites/data/locs.csv").then((data) => {
+                    // data.forEach(d => {
+                    //     lat = (parseFloat(d.pool1.split(",")[0])+parseFloat(d.pool2.split(",")[0])+parseFloat(d.pool3.split(",")[0])+parseFloat(d.pool4.split(",")[0]))/4
+                    //     lon = (parseFloat(d.pool1.split(",")[1])+parseFloat(d.pool2.split(",")[1])+parseFloat(d.pool3.split(",")[1])+parseFloat(d.pool4.split(",")[1]))/4
+                    //     L.marker([lat, lon], {icon : redIcon}).addTo(mymap)
+                        
+                    // })
+                    var lat = parseFloat(data[80].pool1.split(",")[0])
+                    var lon = parseFloat(data[80].pool1.split(",")[1])
+                    L.marker([lat, lon],{icon : redIcon}).addTo(mymap)
+                    var ecartColline = L.latLng([lat, lon]).distanceTo(L.latLng([41.9973938, 8.8269047]))
+                    var ecartVasque = L.latLng([lat, lon]).distanceTo(L.latLng([41.9977982, 8.8280001]))
+                    L.circle([41.9973938, 8.8269047], {radius : distRSSI(-102)}).addTo(mymap)
+                    L.circle([41.9977982, 8.8280001], {radius : distRSSI(-38)}).addTo(mymap)
+
+                    var ecartFraises = L.latLng([lat, lon]).distanceTo(L.latLng([41.997522, 8.827901]))
+                    L.circle([41.997522, 8.827901], {radius : distRSSI(-115)}).addTo(mymap)
+
+                    var ecartOliviers = L.latLng([lat, lon]).distanceTo(L.latLng([41.996695, 8.827148]))
+                    L.circle([41.996695, 8.827148], {radius : distRSSI(-111)}).addTo(mymap)
+                })
+                d3.csv("D:/Users/Alexm/Documents/SmartPaesi/Map Sites/data/dataColline.csv").then(data => {
+                    // data.forEach(d => {
+                    //     L.marker([d.lat, d.lon], {icon : greenIcon}).addTo(mymap)
+                    // })
+                    L.marker([data[0].lat, data[0].lon], {icon : greenIcon}).addTo(mymap)
+                })
+
+                L.tileLayer(
+                    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    maxZoom: 35,
+                    }).addTo(mymap);
+
+                    // // script trigo
+                    // mesures = [[42.29904122727536, 9.153458728684505], [42.298999677686716, 9.153528205847502], [42.29900336541216, 9.153538332832325], [42.29907443673336, 9.153405649549539], [42.2990499924259, 9.15344365386019], [42.29902479486475, 9.153435182831304], [42.29907443673336, 9.153405649549539], [42.29902479486475, 9.153435182831304], [42.29902479486475, 9.153435182831304], [42.29903585346302, 9.153425055718381], [42.29894452316931, 9.153492842005587]]
+                    
+                    // // script grecs
+                    // // mesures = [[42.299052342510905, 9.15369469161728], [42.29930762479606, 9.153479846237886], [42.299069526255025, 9.153578526143534], [42.299121078090195, 9.153587832472027], [42.299310671126754, 9.153414984564217], [42.2992308876974, 9.15346599294655], [42.299337623346396, 9.153449387392506], [42.299310671126754, 9.153414984564217], [42.299337623346396, 9.153449387392506], [42.299337623346396, 9.153449387392506], [42.299286071860024, 9.153440080841017], [42.29929624617776, 9.153522086228941], [42.299166023030644, 9.153445303637437], [42.299084198515054, 9.153736317019368], [42.29300208111076, 9.156998571557633], [42.2934728761874, 9.156190436169467], [42.285947829682264, 9.16170038370345], [42.29596853849278, 9.155336053206353], [42.29526427302749, 9.155794810842716], [42.296028296709984, 9.155340938970227], [42.296588746173235, 9.154953734818225], [42.296576949522986, 9.154955570099267], [42.296576949522986, 9.154955570099267], [42.29700903583128, 9.154637056714455], [42.29594634598036, 9.155322179258468], [42.29707238431669, 9.154644527761903], [42.2965516084663, 9.15494218582201], [42.29653719553769, 9.15494442813437], [42.29703524626097, 9.154632978988683], [42.29707238431669, 9.154644527761903], [42.298399535409295, 9.153955240766098], [42.27337151832562, 9.17155376535664], [42.30359899950744, 9.15601822893785], [42.29828716353278, 9.155295018526465], [42.23116308906123, 9.201840646746307], [41.818236915479424, 9.462208205780632], [42.039449359061656, 9.32163101010318], [42.040904334654066, 9.321170685977295], [41.41810012263551, 9.718029880547766], [41.90699071935714, 9.405931897256682], [42.03728353315604, 9.32231623270421], [41.9777321907071, 9.360007136370433], [42.03728353315604, 9.32231623270421], [42.157173578141, 9.245283879032334], [42.1943199968001, 9.22648168847369], [42.29697519560083, 9.155464277413198]]
+                    // mesures.forEach(element => {
+                    //     L.marker(element).addTo(mymap)
+                    // });
+
+                    
+            </script>
+            
+
+        </body>
+        </html>

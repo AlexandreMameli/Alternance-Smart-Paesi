@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   <link rel="stylesheet" href="style.css"/>
+   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+   <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+</head>
+<body>
+        <div id="mapid"></div>
+        <script>
+                const Rainbow = require('rainbowvis.js');
+                const d3 = require('d3-fetch')
+
+                var mymap = L.map('mapid').setView([41.9403056,9.159416666666665], 15)
+
+                var mapLink = '<a href="http://www.esri.com/">Esri</a>';
+                var wholink = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+
+                L.tileLayer(
+                    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: '&copy; '+mapLink+', '+wholink,
+                    maxZoom: 35,
+                    }).addTo(mymap);
+                
+                    var numberOfItems = 10
+                    var rainbow = new Rainbow(); 
+                    rainbow.setNumberRange(1, numberOfItems);
+                    rainbow.setSpectrum('green', 'red');
+                    var s = [];
+                    for (var i = 1; i <= numberOfItems; i++) {
+                        var hexColour = rainbow.colourAt(i);
+                        s.push('#' + hexColour)
+                    }
+                    console.log(s)
+                    rssi = []
+                    var leFichier = d3.csv("D:/Users/Alexm/Documents/SmartPaesi/Map Sites/data/donneesPycomTxRx/data.csv").then(function(data) {
+                                        data.forEach(element => {
+                                            rssi.push(Math.abs(Number(element.avr_rssi)))
+                                        });
+                                        console.log(rssi.sort(function(a, b) {
+                                            return a - b;
+                                        }))
+                                        for(var i = 0; i!=10; i++){
+                                            trouve = rssi.findIndex(elt => elt==Math.abs(data[i].avr_rssi))
+                                            console.log(data[i].avr_rssi)
+                                            L.circle([data[i].lat,data[i].lng], {
+                                                color: s[trouve],
+                                                fillColor: s[trouve],
+                                                fillOpacity: 0.5,
+                                                radius: 10
+                                            }).addTo(mymap);
+                                        }
+                                    });
+
+
+            </script>
+            
+
+</body>
+</html>
