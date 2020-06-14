@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>test</h1>
+
+    <button id="mbutt">Le bouton magique</button>
+    <button id="but2">La Loc</button>
+    <textarea id="loc"></textarea>
+    <script>
+
+        document.querySelector("#but2").addEventListener("click", () => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                    document.querySelector("#loc").value = position.coords.latitude + "  " + position.coords.longitude
+                }); 
+        })
+        
+        option = {
+            filters: [
+                {name: 'OnePlus 5T'}
+        ],
+        optionalServices: ['battery_service']
+        };
+    
+        document.querySelector("#mbutt").addEventListener("click", () => {
+            navigator.bluetooth.requestDevice(option)
+            .then(device => {
+                console.log("ok");})
+            .catch(error => {
+                console.log("nope");
+        });
+        })
+
+        
+        </script>
+</body>
+</html>

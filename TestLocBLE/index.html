@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <button id="mbutt" style="width: 100%;height: 200px;background-color: aqua;">Connection</button></br>
+    <p id="pLoc" style="height: 100px;"></p>
+    <button id="but2" style="width: 100%;height: 200px;background-color: green;">Transmettre</button>
+    <script>
+
+        // document.querySelector("#mbutt").addEventListener("click", () => {
+        //     navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices: [0xAAAA]})
+        //     // navigator.bluetooth.requestDevice({filters: [{services : [0xAAAA]}]})
+        //     .then(device => {
+        //         document.getElementById("dev").innerHTML = "dev: " + device.name
+        //         return device.gatt.connect();
+        //         })
+        //     .then(server => {
+        //         // Getting Service ou pas 1 2 test test...
+        //         document.getElementById("t1").innerHTML = "connect ok";
+        //         return server.getPrimaryServices(0xAAAA);
+        //         })
+        //     .then(service => {
+        //         // Getting Service Characteristic...
+        //         document.getElementById("t2").innerHTML = "service ok";
+        //         return service.getCharacteristic(0xBBBB);
+        //         })
+        //     .then(characteristic => {
+        //         document.getElementById("t3").innerHTML = "chara ok";
+        //         return characteristic.readValue();
+        //         })
+        //     .then(value => {
+        //         document.getElementById("chara").innerHTML = 'la valeur a pe changé : ' + value;
+        //         })
+        //     .catch(error => {
+        //         document.getElementById("nope").innerHTML = "nope " + error;
+        // });
+        
+        
+        // });
+
+        let device, sendCharacteristic, receiveCharacteristic, loc;
+        document.getElementById("mbutt").onclick = async () => {
+            device = await navigator.bluetooth
+                        .requestDevice({acceptAllDevices:true, optionalServices: [0xAAAA]});
+
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService(0xAAAA);
+
+            receiveCharacteristic = await service.getCharacteristic(0xBBBB);
+            // value = await receiveCharacteristic.readValue();
+            // document.getElementById("chara").innerHTML = 'la valeur ? : ' + value.getUint8(0);
+            // listen();
+        };
+        let valeur;
+        const listen = () => {
+        receiveCharacteristic
+            .addEventListener('characteristicvaluechanged', 
+            async (evt) => {
+                // valeur = await receiveCharacteristic.readValue();
+                valeur = evt.target.value.getInt8(0);
+                console.log(valeur);
+                // document.getElementById("t1").innerText = "test :" + loc[0] + "," + loc[1] + ":" + valeur;
+                // document.getElementById("t1").innerText = "test : " + valeur;
+            });
+
+        receiveCharacteristic.startNotifications();
+        };
+
+        document.querySelector("#but2").addEventListener("click", async () => {
+            // valeur = await receiveCharacteristic.readValue();
+            navigator.geolocation.getCurrentPosition((position) => {
+                document.getElementById("pLoc").innerText = position.coords.latitude + "," + position.coords.longitude;
+                loc = [position.coords.latitude, position.coords.longitude]
+                receiveCharacteristic.writeValue(str2ab(loc.toString()));
+                // document.getElementById("t2").innerText += "loc : " + loc[0] + "," + loc[1] + "; rssi : " + valeur.getInt8(0) + "\r\n";
+                    
+            });
+        });
+
+        function str2ab(str) {
+            var buf = new ArrayBuffer(str.length);
+            var bufView = new Uint8Array(buf);
+            for (var i=0, strLen=str.length; i < strLen; i++) {
+                bufView[i] = str.charCodeAt(i);
+        }
+
+  return buf;
+}
+
+
+
+        </script>
+</body>
+</html>
