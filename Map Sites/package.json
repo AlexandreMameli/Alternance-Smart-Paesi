@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^6.0.12"
+    "electron": "^7.2.4"
   },
   "dependencies": {
     "@turf/line-intersect": "^6.0.2",
